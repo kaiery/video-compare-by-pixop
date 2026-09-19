@@ -1,3 +1,47 @@
+# video-compare：新增独立 GUI 启动器
+
+本项目在视频比较工具的基础上，新增了面向 **Windows x64** 的独立图形启动器，代码位于 [`gui-launcher/`](gui-launcher/)。可以在界面中选择引擎、加载视频、配置比较参数并启动比较，无需手工拼写命令行。
+
+## GUI 功能
+
+- **选择比较引擎**：通过文件选择框指定已有的 `video-compare.exe`，使用其原目录中的配套 DLL；可检查引擎版本。
+- **一个参考视频＋多个待比较视频**：左侧选择参考输入，右侧支持批量添加、拖入文件、勾选启用、复制、编辑和调整顺序。开始比较后，在本体窗口中切换右侧视频；多个右侧视频不会同时平铺。
+- **常用与完整参数设置**：提供分割、水平和垂直布局，窗口尺寸、循环方式、时间偏移、差异视图、高 DPI 等常用控件；完整设置覆盖当前源码的 61 个 CLI 选项及 11 个逐右侧覆盖字段，并提供参数校验和命令预览。
+- **多种输入与逐视频配置**：可配置本地文件、图片序列、网络地址／协议和脚本输入，以及各右侧条目的滤镜等覆盖设置；实际支持能力取决于所选引擎。
+- **会话与参数文件**：支持保存／打开 `.vcgui` 会话，导入／导出引擎 `.opt` 参数文件，查看配置来源及合并结果。
+- **启动、停止与日志**：启动外部比较进程，查看标准输出、错误输出、进程状态和退出码；支持正常停止及停止超时后的确认强制结束。
+- **引擎能力查询**：查询帮助、版本、播放器操作、滤镜、协议、解封装器、解码器和硬件加速能力。
+
+GUI 负责配置和启动，视频解码、画面显示及播放快捷键仍由所选 `video-compare.exe` 提供。它不会改变本体的帧缓存或逐帧导航行为，也不包含引擎及其 DLL。参数控件覆盖不代表全部硬件、输入和交互组合均已通过实机验证。
+
+## 构建与使用 GUI
+
+已安装 Visual Studio C++ 桌面开发工具、Windows SDK 和 CMake 后，在项目根目录执行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\gui-launcher\tools\build.ps1 -Configuration Release -Test -Install
+```
+
+然后运行 `gui-launcher/dist/video-compare-gui.exe`：
+
+1. 点击“选择程序…”，选择已有的 `video-compare.exe`，保留其配套 DLL。
+2. 选择左侧参考视频，向右侧列表添加并启用一个或多个待比较视频。
+3. 设置比较选项，点击“校验与预览”，确认后点击“开始比较”。
+
+一般顺序播放请选择“连续播放（不循环）”；缓冲区循环默认只循环缓存中的 50 帧，不是循环整段视频。
+
+更多说明见 [GUI 使用与构建文档](gui-launcher/README.md)、[源码选项与验收覆盖表](gui-launcher/COVERAGE.md) 和 [GUI 控件映射](gui-launcher/P04-CONTROLS.md)。发布模板 `gui-launcher/release/` 按本项目约定仅在本机保留，不随 Git 提交；从 Git 检出后可直接构建和测试 GUI，生成发布压缩包前需另行准备模板。
+
+## 原项目来源
+
+原项目为 **[pixop/video-compare](https://github.com/pixop/video-compare)**。
+
+[![原项目 GitHub release](https://img.shields.io/github/release/pixop/video-compare)](https://github.com/pixop/video-compare/releases)
+
+上面的徽章对应原项目发布版本，不代表本项目 GUI 的版本。以下保留本仓库原有 README 全文，其安装、命令行用法及播放器操作说明供继续查阅；GUI 的使用方式以上文及独立启动器文档为准。
+
+---
+
 # <img src="https://github.com/user-attachments/assets/da615466-683e-4cc5-8380-32a98d743ba0" alt="Logo" width="32"/>&nbsp; video-compare
 
 [![GitHub release](https://img.shields.io/github/release/pixop/video-compare)](https://github.com/pixop/video-compare/releases)
