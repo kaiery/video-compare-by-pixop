@@ -1,0 +1,12 @@
+# Keep standalone build definitions despite the parent's broad ignore rules.
+!CMakeLists.txt
+!CMakePresets.json
+!/LICENSE.txt
+/build/
+/dist/
+/releases/
+/release/
+/work/
+/.vs/
+/CMakeUserPresets.json
+*.user
