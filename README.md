@@ -1,6 +1,13 @@
-# video-compare：新增独立 GUI 启动器
+# Video Compare GUI — 图形启动与双向逐帧视频比较
 
 本项目在视频比较工具的基础上，新增了面向 **Windows x64** 的独立图形启动器，代码位于 [`gui-launcher/`](gui-launcher/)。可以在界面中选择引擎、加载视频、配置比较参数并启动比较，无需手工拼写命令行。
+
+本仓库：[kaiery/video-compare-gui](https://github.com/kaiery/video-compare-gui)。除独立 GUI 外，本分支也包含本体双向逐帧及退帧缓存优化；原项目来源见下文说明。
+
+```powershell
+git clone https://github.com/kaiery/video-compare-gui.git
+cd video-compare-gui
+```
 
 ## 本体正式版：20260920-frame-step-cache
 
