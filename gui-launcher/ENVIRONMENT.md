@@ -1,10 +1,18 @@
 # 环境核验记录
 
+当前项目路径：`D:\ProjectAI\video-compare-gui`。远程仓库：`https://github.com/kaiery/video-compare-gui.git`。
+
+2026-09-20 环境核验：
+
+- 【已验收】origin 指向 `kaiery/video-compare-gui`，CMake 缓存路径与项目目录一致。
+- 【已验收】GUI Debug / Release 各 11 组测试通过，Release 安装完成，Installed 窗口检查正常退出（退出码 0）。
+- 【已验收】本体 Release 构建成功，逐帧单元测试通过；正式发布目录逐文件 SHA-256 校验及仅系统 PATH 下版本检查通过。
+
 核验日期：2026-09-19。初次计划阶段仅执行读取与文件存在性检查；本轮 P01 已完成构建和窗口运行，未安装额外工具。
 
 | 项目 | 本机证据与结论 |
 |---|---|
-| 工作目录 | `D:\ProjectAI\video-compare-by-pixop` |
+| 工作目录 | `D:\ProjectAI\video-compare-gui` |
 | 原项目源码基线 | Git HEAD `dcdbefcdf7900659cb1a1f2631edbccfdcb1398c` |
 | 原工作区 | 创建计划前 `git status --short` 无输出 |
 | VS 安装 | `vswhere` 检测到 Visual Studio Build Tools 18.6.11806.211，安装完整 |

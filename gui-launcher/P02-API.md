@@ -55,7 +55,7 @@ Clear 的底层含义由引擎字段决定：滤镜为空、色彩空值、色�
 ```cpp
 #include "core/model.h"
 
-auto session = launcher::make_session(LR"(D:\ProjectAI\video-compare-by-pixop\gui-launcher)");
+auto session = launcher::make_session(LR"(D:\ProjectAI\video-compare-gui\gui-launcher)");
 session.engine_path = LR"(D:\VideoCompare\video-compare.exe)";
 session.left = {launcher::InputKind::File, LR"(D:\视频\参考.mp4)"};
 launcher::add_right(session, {launcher::InputKind::File, LR"(D:\视频\输出 A.mp4)"});
