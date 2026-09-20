@@ -1,4 +1,5 @@
 #pragma once
+#include <exception>
 #include <atomic>
 #include <limits>
 #include <map>

@@ -1,5 +1,6 @@
 #include "string_utils.h"
 #include <algorithm>
+#include <iterator>
 #include <cctype>
 #include <cmath>
 #include <iostream>

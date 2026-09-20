@@ -76,6 +76,8 @@ test_bin = $(patsubst %.cpp,%$(EXE),$(test_src))
 integration_src = tests/integration_video_compare.cpp
 integration_obj = $(integration_src:.cpp=.o)
 integration_dep = $(integration_obj:.o=.d)
+frame_step_obj = tests/integration_frame_step.o
+frame_step_dep = tests/integration_frame_step.d
 integration_bin = tests/integration_video_compare$(EXE)
 integration_app_obj = $(filter-out src/main.o,$(obj))
 integration_timeout_s ?= 45
@@ -88,7 +90,7 @@ all: $(target)
 $(target): $(obj)
 	$(CXX) -o $@ $^ $(LDLIBS)
 
--include $(dep) $(test_dep) $(integration_dep)
+-include $(dep) $(test_dep) $(integration_dep) $(frame_step_dep)
 
 %.d: %.cpp
 	@$(CXX) $(CXXFLAGS) $< -MM -MT $(@:.d=.o) >$@
@@ -106,6 +108,7 @@ tests/test_playback_timing$(EXE): TEST_LIBS = $(LDLIBS)
 tests/test_playback_seek$(EXE): TEST_LIBS = $(LDLIBS)
 
 tests/test_playback_navigation$(EXE): TEST_LIBS = $(LDLIBS)
+tests/test_frame_step$(EXE): TEST_LIBS = $(LDLIBS)
 
 tests/test_format_converter$(EXE): \
 	src/format_converter.o src/frame_metadata.o src/ffmpeg.o src/side_aware_logger.o src/core_types.o
@@ -118,6 +121,13 @@ tests/test_video_filterer$(EXE): TEST_LIBS = $(LDLIBS)
 
 $(integration_bin): $(integration_obj) $(integration_app_obj)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDLIBS)
+
+tests/integration_frame_step$(EXE): tests/integration_frame_step.o $(integration_app_obj)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDLIBS)
+
+.PHONY: frame-step-check
+frame-step-check: tests/integration_frame_step$(EXE)
+	@bash tests/check_frame_step.sh "$(CURDIR)/tests/integration_frame_step$(EXE)"
 
 .PHONY: check
 check: $(test_bin)
@@ -191,7 +201,7 @@ check-one: tests/test_$(TEST)$(EXE)
 .PHONY: clean
 clean:
 	# Also remove root-level objects/deps left by the pre-src/ layout.
-	$(RM) $(obj) $(target) $(dep) $(test_obj) $(test_dep) $(test_bin) $(integration_obj) $(integration_dep) $(integration_bin) $(notdir $(obj)) $(notdir $(dep))
+	$(RM) $(obj) $(target) $(dep) $(test_obj) $(test_dep) $(test_bin) $(integration_obj) $(integration_dep) $(integration_bin) $(frame_step_obj) $(frame_step_dep) tests/integration_frame_step$(EXE) $(notdir $(obj)) $(notdir $(dep))
 
 install: $(target)
 	install -s $(target) $(BINDIR)

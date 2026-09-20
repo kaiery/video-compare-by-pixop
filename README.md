@@ -2,6 +2,25 @@
 
 本项目在视频比较工具的基础上，新增了面向 **Windows x64** 的独立图形启动器，代码位于 [`gui-launcher/`](gui-launcher/)。可以在界面中选择引擎、加载视频、配置比较参数并启动比较，无需手工拼写命令行。
 
+## 本体正式版：20260920-frame-step-cache
+
+Windows x64 便携发布包：`video-compare-20260920-frame-step-cache-windows-x64.zip`。本机构建产物位于 `dist/`，包含 Release 优化编译的 `video-compare.exe`、所需 DLL、许可证和使用说明；解压即可使用，无需安装编译器或开发工具。`dist/` 不纳入 Git，因此从源码仓库检出不会自动获得二进制文件。
+
+1. 将整个 ZIP 解压到一个独立目录，保留 EXE 和全部 DLL，不能只复制 EXE。
+2. 在 GUI 的“比较程序”中选择该目录的 `video-compare.exe`，选择视频后开始比较。GUI 与本体分别发布，本体包不包含 GUI。
+3. 也可以直接在解压目录用 PowerShell 启动：
+
+```powershell
+.\video-compare.exe --version
+.\video-compare.exe -- "D:\Videos\参考.mp4" "D:\Videos\待比较1.mp4" "D:\Videos\待比较2.mp4"
+```
+
+本体是需要输入视频路径的播放器；双击无参数的 EXE 不会弹出视频选择框，需要图形化选择文件时请使用 GUI。版本检查应输出 `video-compare 20260920-frame-step-cache`。
+
+本版包含准确双向逐帧、播放结束后持续后退，以及退帧历史缓存优化。`A` / `Shift+A` 后退一参考帧，`D` / `Shift+D` 前进一参考帧，空格恢复播放。建议先保持默认 50 帧缓存；缓存耗尽时仍需重新解码，可能短暂停顿。
+
+同目录另提供对应工作区源码快照 `*-source.zip` 和 `*.sha256` 校验文件。详见 [正式版使用、构建与验收说明](docs/engine-release.md)。
+
 ## GUI 功能
 
 - **选择比较引擎**：通过文件选择框指定已有的 `video-compare.exe`，使用其原目录中的配套 DLL；可检查引擎版本。
@@ -32,13 +51,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\gui-launcher\tools\build.p
 
 更多说明见 [GUI 使用与构建文档](gui-launcher/README.md)、[源码选项与验收覆盖表](gui-launcher/COVERAGE.md) 和 [GUI 控件映射](gui-launcher/P04-CONTROLS.md)。发布模板 `gui-launcher/release/` 按本项目约定仅在本机保留，不随 Git 提交；从 Git 检出后可直接构建和测试 GUI，生成发布压缩包前需另行准备模板。
 
+## 本分支新增：双向逐帧浏览
+
+在使用本分支重新编译的本体时，`A` / `D` 会暂停并逐帧后退／前进，`Shift+A` / `Shift+D` 是相同操作的别名。后退可越过帧缓存边界，支持播放结束后从最后一帧持续退到第一帧。左侧参考视频决定步进帧序列，右侧按参考时间对齐；不同帧率的右侧可能保持同一帧或跨过若干帧。
+
+此功能需要新的 `video-compare.exe`，仅更新 GUI 不会改变旧引擎行为。连续后退优先使用已验证的播放缓存，缓存外按配置容量批量补齐历史帧，减少重复寻址。长 GOP 视频越过缓存时仍需重新解码，响应可能比缓存内切换慢；非可寻址输入无法保证向后逐帧。可变帧率输入如需保留原始时间戳，可使用已有的 `--left-decoder-options trust_dec_pts=1`，并按需为右侧配置相同选项。
+
+实现边界及复验方式见 [双向逐帧说明](docs/frame-stepping.md)。
+
 ## 原项目来源
 
 原项目为 **[pixop/video-compare](https://github.com/pixop/video-compare)**。
 
 [![原项目 GitHub release](https://img.shields.io/github/release/pixop/video-compare)](https://github.com/pixop/video-compare/releases)
 
-上面的徽章对应原项目发布版本，不代表本项目 GUI 的版本。以下保留本仓库原有 README 全文，其安装、命令行用法及播放器操作说明供继续查阅；GUI 的使用方式以上文及独立启动器文档为准。
+上面的徽章对应原项目发布版本，不代表本项目 GUI 的版本。以下沿用本仓库原有 README，逐帧快捷键说明已按本分支实现更新；GUI 的使用方式以上文及独立启动器文档为准。
 
 ---
 
@@ -240,8 +267,8 @@ see all supported options.
 - `C`: Magnify area around cursor (shown in lower-right corner)
 - `J`: Reduce playback speed
 - `L`: Increase playback speed
-- `A`: Move to the previous frame in the buffer
-- `D`: Move to the next frame in the buffer
+- `A`: Pause and step to the previous reference frame, re-decoding earlier frames when needed beyond the buffer
+- `D`: Pause and step to the next reference frame
 - `E`: Re-center view around mouse position
 - `R`: Global re-center and reset zoom to 100% (x1)
 - `S`: Swap left and right video
@@ -281,8 +308,8 @@ see all supported options.
 - `Ctrl+Shift+R`: Copy right crop to left
 - `Shift+B`: Crop both videos to the same area
 - `Backspace`: Undo last crop operation
-- `Shift+D`: Decode and advance one frame
-- `Shift+A`: Seek to the previous frame (best with intra-frame formats)
+- `Shift+D`: Same as `D`: step forward one reference frame
+- `Shift+A`: Same as `A`: step backward one reference frame
 - `Shift+M`: Cycle display mode
 - `Shift+S`: Cycle aspect view mode
 - `Shift+F`: Select a region and save cutouts as PNGs

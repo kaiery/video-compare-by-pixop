@@ -28,6 +28,10 @@ class Queue {
   bool push(T&& data);
   bool push(const T& data);
   bool pop(T& data);
+  // Nonblocking consumption lets interactive re-decode drain all video sides
+  // fairly (including the single-decoder fan-out pipeline).
+  bool try_pop(T& data);
+  bool is_drained();
 
   void restart();
   void stop();
@@ -98,6 +102,22 @@ bool Queue<T>::pop(T& data) {
   }
 
   return false;
+}
+
+template <class T>
+bool Queue<T>::try_pop(T& data) {
+  std::unique_lock<std::mutex> lock(mutex_);
+  if (quit_ || queue_.empty()) return false;
+  data = std::move(queue_.front());
+  queue_.pop();
+  full_.notify_all();
+  return true;
+}
+
+template <class T>
+bool Queue<T>::is_drained() {
+  std::unique_lock<std::mutex> lock(mutex_);
+  return stopped_ && queue_.empty();
 }
 
 template <class T>

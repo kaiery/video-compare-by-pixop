@@ -572,9 +572,8 @@ void run_event_script(const Scenario scenario, std::atomic<bool>& finished) {
     push_keydown(SDLK_TAB, SDL_SCANCODE_TAB, 0);
     sleep_ms(200);
   } else if (scenario == Scenario::FrameNavigation) {
-    // Pause isolates one-frame movement from continuous fetch. SPACE
-    // toggles play_ to false; Shift+D still fetches via
-    // forward_navigate_frames, and Shift+A still enters the seek path.
+    // Pause isolates one-frame movement from continuous playback. Both
+    // aliases use PTS-based reference navigation, including cache misses.
     push_keydown(SDLK_SPACE, SDL_SCANCODE_SPACE, 0);
     sleep_ms(300);
     push_copy_timestamp();

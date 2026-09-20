@@ -52,3 +52,5 @@ licenses/FFMPEG-SOURCE.txt
 *.avi
 *.ts
 /vmaf_*
+/.local-build/
+/dist/
